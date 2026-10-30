@@ -10,7 +10,7 @@ binary_path=""
 install_dir="/opt/komari"
 tmp=""
 download_connect_timeout="${KOMARI_DOWNLOAD_CONNECT_TIMEOUT:-8}"
-download_max_time="${KOMARI_DOWNLOAD_MAX_TIME:-20}"
+download_max_time="${KOMARI_DOWNLOAD_MAX_TIME:-300}"
 download_low_speed_limit="${KOMARI_DOWNLOAD_LOW_SPEED_LIMIT:-1024}"
 download_low_speed_time="${KOMARI_DOWNLOAD_LOW_SPEED_TIME:-10}"
 

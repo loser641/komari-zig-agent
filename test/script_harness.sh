@@ -274,7 +274,7 @@ test_install_slow_direct_switches_to_proxy_once() {
   direct_count="$(grep -Fx "curl https://github.com/loser641/komari-zig-agent/releases/latest/download/$ASSET" "$LOG" | wc -l | tr -d ' ')"
   [ "$direct_count" = 1 ] &&
     assert_file_contains "$LOG" "curl https://gh.llkk.cc/https://github.com/loser641/komari-zig-agent/releases/latest/download/$ASSET" &&
-    assert_file_contains "$LOG" "--max-time 20" &&
+    assert_file_contains "$LOG" "--max-time 300" &&
     assert_file_contains "$LOG" "--speed-limit 1024" &&
     assert_file_contains "$LOG" "--speed-time 10"
 }
@@ -334,7 +334,7 @@ test_replace_slow_direct_switches_to_proxy_once() {
   [ "$direct_count" = 1 ] &&
     assert_file_contains "$target" "komari test agent" &&
     assert_file_contains "$LOG" "curl https://gh.llkk.cc/https://github.com/loser641/komari-zig-agent/releases/latest/download/$ASSET" &&
-    assert_file_contains "$LOG" "--max-time 20" &&
+    assert_file_contains "$LOG" "--max-time 300" &&
     assert_file_contains "$LOG" "--speed-limit 1024"
 }
 
@@ -421,7 +421,7 @@ test_update_binary_slow_direct_switches_to_proxy_once() {
   [ "$direct_count" = 1 ] &&
     assert_file_contains "$target" "komari test agent" &&
     assert_file_contains "$LOG" "curl https://gh.llkk.cc/https://github.com/loser641/komari-zig-agent/releases/latest/download/$ASSET" &&
-    assert_file_contains "$LOG" "--max-time 20" &&
+    assert_file_contains "$LOG" "--max-time 300" &&
     assert_file_contains "$LOG" "--speed-limit 1024" &&
     assert_no_backup_files "$INSTALL_DIR"
 }
