@@ -74,7 +74,7 @@ test "self update downloads release assets through proxy using real http" {
     defer std.testing.allocator.free(proxy);
     const digest = (try update.downloadGithubUrlToFileViaProxyListForTest(
         std.testing.allocator,
-        "https://github.com/luodaoyi/komari-zig-agent/releases/download/v0.1.17/komari-agent-linux-amd64",
+        "https://github.com/loser641/komari-zig-agent/releases/download/v0.1.17/komari-agent-linux-amd64",
         file,
         &.{proxy},
     )).?;

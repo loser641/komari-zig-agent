@@ -9,7 +9,7 @@ function Log-Error { param([string]$Message) Write-Host "[ERROR] $Message" -Fore
 function Log-Step { param([string]$Message) Write-Host $Message -ForegroundColor Magenta }
 function Log-Config { param([string]$Message) Write-Host "- $Message" -ForegroundColor White }
 
-$Repo = "luodaoyi/komari-zig-agent"
+$Repo = "loser641/komari-zig-agent"
 $InstallDir = Join-Path $Env:ProgramFiles "Komari"
 $ServiceName = "komari-agent"
 $GitHubProxy = ""

@@ -1,0 +1,102 @@
+name: Upstream Watch
+
+# This repository vendors upstream code and builds its own binaries. The point
+# of watching upstream is to notice changes while they are still reviewable,
+# and to notice a rewritten history at all - a scrubbed force-push is invisible
+# to a plain "is there a new commit" check.
+on:
+  schedule:
+    - cron: "23 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: upstream-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 0
+
+      - name: Compare against upstream
+        id: compare
+        env:
+          UPSTREAM_REPO: luodaoyi/komari-zig-agent
+          UPSTREAM_BRANCH: main
+        run: |
+          set -eu
+          status=0
+          bash .github/scripts/upstream-watch.sh > upstream-report.txt || status=$?
+          cat upstream-report.txt
+          {
+            echo "exit_code=$status"
+            while IFS='=' read -r key value; do
+              case "$key" in
+                status|reason|baseline|upstream_sha|commits|files) echo "${key}=${value}" ;;
+              esac
+            done < upstream-report.txt
+          } >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Open or update tracking issue
+        if: steps.compare.outputs.exit_code == '1' || steps.compare.outputs.exit_code == '2'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EXIT_CODE: ${{ steps.compare.outputs.exit_code }}
+          STATUS: ${{ steps.compare.outputs.status }}
+          REASON: ${{ steps.compare.outputs.reason }}
+          BASELINE: ${{ steps.compare.outputs.baseline }}
+          UPSTREAM_SHA: ${{ steps.compare.outputs.upstream_sha }}
+          COMMITS: ${{ steps.compare.outputs.commits }}
+          FILES: ${{ steps.compare.outputs.files }}
+        run: |
+          set -eu
+          if [ "$EXIT_CODE" = "1" ]; then
+            title="上游历史被改写，需要人工核查"
+            body="$(printf '%s\n' \
+              "上游 \`luodaoyi/komari-zig-agent\` 的历史与上次同步记录不一致。" \
+              "" \
+              "- 原因：\`${REASON}\`" \
+              "- 上次同步基准：\`${BASELINE}\`" \
+              "- 上游当前 main：\`${UPSTREAM_SHA}\`" \
+              "" \
+              "这可能是正常 rebase，也可能是投毒提交被抹除。**在查清之前不要合并上游代码，也不要让服务器更新到基于它的版本。**" \
+              "" \
+              "核查步骤：" \
+              "1. 用本仓库保留的完整历史定位差异：\`git log --oneline ${BASELINE}\`" \
+              "2. 对比上游现 main 与本地已核验版本的差异文件" \
+              "3. 确认无误后，把新的上游 commit 写入 \`.github/upstream-baseline\` 再合并")"
+            labels="upstream,security"
+          else
+            title="上游有新提交待审阅"
+            body="$(printf '%s\n' \
+              "上游 \`luodaoyi/komari-zig-agent\` 前进了 ${COMMITS} 个提交，涉及 ${FILES} 个文件。" \
+              "" \
+              "- 上次同步基准：\`${BASELINE}\`" \
+              "- 上游当前 main：\`${UPSTREAM_SHA}\`" \
+              "" \
+              "审阅通过后再合并，并把 \`.github/upstream-baseline\` 更新为 \`${UPSTREAM_SHA}\`。")"
+            labels="upstream"
+          fi
+
+          existing="$(gh issue list --repo "$GH_REPO" --label upstream --state open --limit 1 --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --repo "$GH_REPO" --body "$body"
+          else
+            gh issue create --repo "$GH_REPO" --title "$title" --body "$body" --label "$labels" \
+              || gh issue create --repo "$GH_REPO" --title "$title" --body "$body"
+          fi
+
+      - name: Fail the run when history was rewritten
+        if: steps.compare.outputs.exit_code == '1'
+        run: |
+          echo "::error::上游历史被改写（${{ steps.compare.outputs.reason }}），见 tracking issue"
+          exit 1

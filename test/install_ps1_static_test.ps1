@@ -13,7 +13,7 @@ if ($errors.Count -gt 0) {
 
 $Text = Get-Content -Raw -Path $Script
 $Required = @(
-    'luodaoyi/komari-zig-agent',
+    'loser641/komari-zig-agent',
     '--install-dir',
     '--install-service-name',
     '--install-ghproxy',

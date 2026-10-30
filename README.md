@@ -2,17 +2,24 @@
 
 Zig 版 `komari-agent`，目标是直接替换原 Go agent，并保持 Komari 现有协议、上报字段、任务、Ping、Web SSH、自更新等行为兼容。
 
+> **本仓库是下游镜像，不是上游。**
+> 上游：<https://github.com/luodaoyi/komari-zig-agent>（MIT）。
+> 本仓库保留上游完整提交历史，只把自更新和安装脚本的仓库指向改成本仓库，并使用本仓库的 GitHub Actions 从本仓库源码自行构建发布。
+> 服务器上安装的二进制只认本仓库的 Release，不会回落到上游。
+>
+> 上游每次有新提交或历史被改写，`Upstream Watch` 工作流会开 issue 提醒；合并上游改动前请先审阅。
+
 ## 项目看板
 
 <p>
-  <a href="https://github.com/luodaoyi/komari-zig-agent/actions/workflows/build.yml?query=branch%3Amain"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/luodaoyi/komari-zig-agent/build.yml?branch=main&label=build&logo=githubactions&logoColor=white" /></a>
-  <a href="https://github.com/luodaoyi/komari-zig-agent/actions/workflows/build.yml?query=branch%3Amain"><img alt="Coverage Gate" src="https://img.shields.io/github/actions/workflow/status/luodaoyi/komari-zig-agent/build.yml?branch=main&label=coverage%20100%25%20gate&logo=codecov&logoColor=white" /></a>
-  <a href="https://github.com/luodaoyi/komari-zig-agent/actions/workflows/release.yml"><img alt="Release Workflow" src="https://img.shields.io/github/actions/workflow/status/luodaoyi/komari-zig-agent/release.yml?label=release&logo=githubactions&logoColor=white" /></a>
-  <a href="https://github.com/luodaoyi/komari-zig-agent/releases/latest"><img alt="Latest Release" src="https://img.shields.io/github/v/release/luodaoyi/komari-zig-agent?display_name=tag&sort=semver" /></a>
-  <a href="https://github.com/luodaoyi/komari-zig-agent/releases"><img alt="Release Date" src="https://img.shields.io/github/release-date/luodaoyi/komari-zig-agent" /></a>
-  <a href="https://github.com/luodaoyi/komari-zig-agent/releases"><img alt="Total Downloads" src="https://img.shields.io/github/downloads/luodaoyi/komari-zig-agent/total?label=release%20downloads" /></a>
-  <a href="https://github.com/luodaoyi/komari-zig-agent/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/luodaoyi/komari-zig-agent?style=flat" /></a>
-  <a href="https://github.com/luodaoyi/komari-zig-agent/issues"><img alt="Issues" src="https://img.shields.io/github/issues/luodaoyi/komari-zig-agent" /></a>
+  <a href="https://github.com/loser641/komari-zig-agent/actions/workflows/build.yml?query=branch%3Amain"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/loser641/komari-zig-agent/build.yml?branch=main&label=build&logo=githubactions&logoColor=white" /></a>
+  <a href="https://github.com/loser641/komari-zig-agent/actions/workflows/build.yml?query=branch%3Amain"><img alt="Coverage Gate" src="https://img.shields.io/github/actions/workflow/status/loser641/komari-zig-agent/build.yml?branch=main&label=coverage%20100%25%20gate&logo=codecov&logoColor=white" /></a>
+  <a href="https://github.com/loser641/komari-zig-agent/actions/workflows/release.yml"><img alt="Release Workflow" src="https://img.shields.io/github/actions/workflow/status/loser641/komari-zig-agent/release.yml?label=release&logo=githubactions&logoColor=white" /></a>
+  <a href="https://github.com/loser641/komari-zig-agent/releases/latest"><img alt="Latest Release" src="https://img.shields.io/github/v/release/loser641/komari-zig-agent?display_name=tag&sort=semver" /></a>
+  <a href="https://github.com/loser641/komari-zig-agent/releases"><img alt="Release Date" src="https://img.shields.io/github/release-date/loser641/komari-zig-agent" /></a>
+  <a href="https://github.com/loser641/komari-zig-agent/releases"><img alt="Total Downloads" src="https://img.shields.io/github/downloads/loser641/komari-zig-agent/total?label=release%20downloads" /></a>
+  <a href="https://github.com/loser641/komari-zig-agent/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/loser641/komari-zig-agent?style=flat" /></a>
+  <a href="https://github.com/loser641/komari-zig-agent/issues"><img alt="Issues" src="https://img.shields.io/github/issues/loser641/komari-zig-agent" /></a>
 </p>
 
 <p>
@@ -39,7 +46,7 @@ Zig 版 `komari-agent`，目标是直接替换原 Go agent，并保持 Komari �
 - Zig：0.16.0。
 - 服务端原项目：`komari-monitor/komari`，仓库地址 <https://github.com/komari-monitor/komari>。
 - Agent 兼容目标：`komari-monitor/komari-agent` 协议，原 Agent 仓库 <https://github.com/komari-monitor/komari-agent>。
-- 发布仓库：`luodaoyi/komari-zig-agent`。
+- 发布仓库：`loser641/komari-zig-agent`。
 - 自更新：检查本仓库 GitHub Release，不再下载原 Go 仓库版本。
 
 ## 相较官方 Go Agent 的优势
@@ -83,13 +90,13 @@ Zig 版 `komari-agent`，目标是直接替换原 Go agent，并保持 Komari �
 已经装了默认服务名为 `komari-agent` 的官方 Go Agent？直接执行下面一条命令即可替换为 Zig 版。原有的面板地址、Token 和上报间隔都会保留，无需重新配置。
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/luodaoyi/komari-zig-agent/bd2e0b8de76a11601d57b1663e9002912e1a82f2/replace.sh | sudo sh
+curl -fsSL https://raw.githubusercontent.com/loser641/komari-zig-agent/main/replace.sh | sudo sh
 ```
 
 国内网络无法访问 GitHub 时，使用 jsDelivr CDN：
 
 ```sh
-curl -fsSL https://cdn.jsdelivr.net/gh/luodaoyi/komari-zig-agent@bd2e0b8de76a11601d57b1663e9002912e1a82f2/replace.sh | sudo sh
+curl -fsSL https://cdn.jsdelivr.net/gh/loser641/komari-zig-agent@main/replace.sh | sudo sh
 ```
 
 脚本会自动识别 CPU 架构，下载匹配的 Release，校验 `SHA256SUMS`，备份原 Go Agent，替换后重启原服务。下载、校验或启动失败时不会覆盖正在使用的 Agent；systemd 启动失败会自动回滚。
@@ -101,7 +108,7 @@ curl -fsSL https://cdn.jsdelivr.net/gh/luodaoyi/komari-zig-agent@bd2e0b8de76a116
 Agent 启动后会检查：
 
 ```text
-https://api.github.com/repos/luodaoyi/komari-zig-agent/releases/latest
+https://api.github.com/repos/loser641/komari-zig-agent/releases/latest
 ```
 
 若发现更高版本，会下载与当前平台匹配的资产，例如：
@@ -207,8 +214,8 @@ Action 会自动：
 
 ## Star History
 
-<a href="https://github.com/luodaoyi/komari-zig-agent/tree/star-history">
-  <img alt="Star History Chart" src="https://raw.githubusercontent.com/luodaoyi/komari-zig-agent/star-history/star-history.svg" />
+<a href="https://github.com/loser641/komari-zig-agent/tree/star-history">
+  <img alt="Star History Chart" src="https://raw.githubusercontent.com/loser641/komari-zig-agent/star-history/star-history.svg" />
 </a>
 
 图表由仓库自身的 GitHub Actions 每日更新；历史数据和 SVG 保存在独立的 `star-history` 分支，不依赖第三方图表服务。
